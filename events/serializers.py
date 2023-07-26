@@ -42,9 +42,12 @@ class OrganizerProfileSerializer(serializers.ModelSerializer):
         return organizer_profile
 
 class EventSerializer(serializers.ModelSerializer):
+    """ organizerID = serializers.PrimaryKeyRelatedField(queryset=OrganizerProfile.objects.all(), source='organizerID.organizerID') """
+
     class Meta:
         model = Event
         fields = '__all__'
+
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:

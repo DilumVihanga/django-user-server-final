@@ -74,3 +74,22 @@ def validate_username_email(request):
         data['email_taken'] = existing_emails.exists()
 
     return Response(data)
+
+# backend/users/views.py
+
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from .serializers import OrganizerProfileSerializer
+from .models import OrganizerProfile
+
+class OrganizerProfileView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrganizerProfileSerializer
+
+    def get_queryset(self):
+        user_id = self.request.query_params.get('user')
+        queryset = OrganizerProfile.objects.filter(user__id=user_id)
+        return queryset
+
+       
+        

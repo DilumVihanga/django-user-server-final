@@ -89,6 +89,8 @@ def create_organizer_profile(sender, instance, created, **kwargs):
 
 
 class Event(models.Model):
+    eventID = models.AutoField(primary_key=True)
+    organizerID = models.ForeignKey('OrganizerProfile', on_delete=models.CASCADE)
     eventNAME = models.CharField(max_length=200)
     eventDATE = models.DateField()
     eventDISCRIPTION = models.TextField()
