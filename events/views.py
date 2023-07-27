@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .models import User,CustomerProfile, OrganizerProfile
-from .models import Event, Ticket, TicketType, Order, Payment, QRCode
+from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode
 from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer
-from .serializers import EventSerializer, TicketSerializer, TicketTypeSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer
+from .serializers import EventSerializer, TicketSerializer, TicketPackageSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer
 from rest_framework import viewsets
 
 # Create your views here.
@@ -10,7 +10,6 @@ from rest_framework import viewsets
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
 
 
 class CustomerProfileViewSet(viewsets.ModelViewSet):
@@ -29,9 +28,9 @@ class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
-class TicketTypeViewSet(viewsets.ModelViewSet):
-    queryset = TicketType.objects.all()
-    serializer_class = TicketTypeSerializer
+class TicketPackageViewSet(viewsets.ModelViewSet):
+    queryset = TicketPackage.objects.all()
+    serializer_class = TicketPackageSerializer    
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -75,21 +74,8 @@ def validate_username_email(request):
 
     return Response(data)
 
-# backend/users/views.py
-
-from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated
-from .serializers import OrganizerProfileSerializer
-from .models import OrganizerProfile
-
-class OrganizerProfileView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = OrganizerProfileSerializer
-
-    def get_queryset(self):
-        user_id = self.request.query_params.get('user')
-        queryset = OrganizerProfile.objects.filter(user__id=user_id)
-        return queryset
-
-       
-        
+@api_view(['GET'])
+def getEventsbyUser(request , user_id):
+    events = Event.objects.filter(user=user_id)
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)

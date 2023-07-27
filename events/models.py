@@ -90,7 +90,7 @@ def create_organizer_profile(sender, instance, created, **kwargs):
 
 class Event(models.Model):
     eventID = models.AutoField(primary_key=True)
-    organizerID = models.ForeignKey('OrganizerProfile', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
     eventNAME = models.CharField(max_length=200)
     eventDATE = models.DateField()
     eventDISCRIPTION = models.TextField()
@@ -104,26 +104,27 @@ class Event(models.Model):
     def __str__(self):
         return self.eventNAME
 
-class TicketType(models.Model):
-    ticketT_ID = models.AutoField(primary_key=True)
-    organizerID = models.ForeignKey('OrganizerProfile', on_delete=models.CASCADE)
-    ticketT_NAME = models.CharField(max_length=200)
-    ticketT_PRICE = models.DecimalField(max_digits=7, decimal_places=2)
-    ticketDISCRIPTION = models.TextField()
-    ticketT_QUANTITY = models.IntegerField()
+class TicketPackage(models.Model):
+    packageID = models.AutoField(primary_key=True)
+    eventID = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='ticket_packages')
+    package_name = models.CharField(max_length=200)
+    package_description = models.TextField()
+    package_price = models.DecimalField(max_digits=7, decimal_places=2)
+    package_ticketquantity = models.IntegerField()
 
     def __str__(self):
-        return self.ticketT_NAME
-
+        return self.package_name
 
 class Ticket(models.Model):
     ticketID = models.AutoField(primary_key=True)
-    eventID = models.ForeignKey('Event', on_delete=models.CASCADE)
-    ticketT_ID = models.ForeignKey('TicketType', on_delete=models.CASCADE)
-    ticketSTATUS = models.CharField(max_length=200)
+    packageID = models.ForeignKey(TicketPackage, on_delete=models.CASCADE, related_name='tickets')
+    ticket_type = models.CharField(max_length=200)
+    ticket_quantity = models.IntegerField()
+    ticket_price = models.DecimalField(max_digits=7, decimal_places=2)
+    ticket_description = models.TextField()
 
     def __str__(self):
-        return str(self.ticketID)
+        return f"{self.packageID.package_name} - {self.ticket_type}"
 
 
 class Order(models.Model):
