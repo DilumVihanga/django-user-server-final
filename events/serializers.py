@@ -1,7 +1,7 @@
 # events/serializers.py
 from rest_framework import serializers
 from .models import CustomerProfile, OrganizerProfile
-from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode
+from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode, Cart, CartItem
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -58,13 +58,25 @@ class TicketPackageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EventSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    """ user = serializers.StringRelatedField() """
     ticket_packages = TicketPackageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
         fields = '__all__'
 
+
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = '__all__'
+
+class CartSerializer(serializers.ModelSerializer):
+    cart_items = CartItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = '__all__'        
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:

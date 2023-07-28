@@ -90,7 +90,7 @@ def create_organizer_profile(sender, instance, created, **kwargs):
 
 class Event(models.Model):
     eventID = models.AutoField(primary_key=True)
-    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     eventNAME = models.CharField(max_length=200)
     eventDATE = models.DateField()
     eventDISCRIPTION = models.TextField()
@@ -114,6 +114,18 @@ class TicketPackage(models.Model):
 
     def __str__(self):
         return self.package_name
+
+
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    ticket_package = models.ForeignKey(TicketPackage, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+
 
 class Ticket(models.Model):
     ticketID = models.AutoField(primary_key=True)

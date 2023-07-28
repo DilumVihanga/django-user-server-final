@@ -82,7 +82,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'jango_react_finaldb0020',
+        'NAME': 'jango_react_finaldb0025',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',

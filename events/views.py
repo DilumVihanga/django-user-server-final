@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from .models import User,CustomerProfile, OrganizerProfile
-from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode
+from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode, Cart, CartItem
 from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer
-from .serializers import EventSerializer, TicketSerializer, TicketPackageSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer
+from .serializers import EventSerializer, TicketSerializer, TicketPackageSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer, CartSerializer, CartItemSerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 # Create your views here.
 
@@ -31,6 +32,22 @@ class TicketViewSet(viewsets.ModelViewSet):
 class TicketPackageViewSet(viewsets.ModelViewSet):
     queryset = TicketPackage.objects.all()
     serializer_class = TicketPackageSerializer    
+
+class CartViewSet(viewsets.ModelViewSet):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+
+    @action(detail=False, url_path='cart/(?P<cart_id>\d+)', methods=['get'])
+    def items_for_cart(self, request, cart_id=None):
+        items = self.get_queryset().filter(cart__id=cart_id)
+        serializer = self.get_serializer(items, many=True)
+        return Response(serializer.data)
+
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
