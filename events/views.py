@@ -135,3 +135,36 @@ def create_checkout_session(request):
     )
 
     return JsonResponse({'session': {'url': session.url}})
+
+
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from .models import TicketPurchase
+import json
+
+@csrf_exempt
+@require_POST
+def save_ticket_purchase(request):
+    try:
+        data = json.loads(request.body)
+        user_id = data['user_id']
+        event_name = data['event_name']
+        package_name = data['package_name']
+        package_price = data['package_price']
+        quantity = data['quantity']
+        subtotal = data['subtotal']
+
+        ticket_purchase = TicketPurchase.objects.create(
+            user_id=user_id,
+            event_name=event_name,
+            package_name=package_name,
+            package_price=package_price,
+            quantity=quantity,
+            subtotal=subtotal
+        )
+
+        return JsonResponse({'success': True, 'ticket_purchase_id': ticket_purchase.id})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})

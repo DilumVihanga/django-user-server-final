@@ -119,6 +119,7 @@ class TicketPackage(models.Model):
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    id = models.CharField(max_length=200,primary_key=True)
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
@@ -126,6 +127,15 @@ class CartItem(models.Model):
     ticket_package = models.ForeignKey(TicketPackage, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
+
+class TicketPurchase(models.Model):
+    user_id = models.IntegerField()
+    event_name = models.CharField(max_length=255)
+    package_name = models.CharField(max_length=255)
+    package_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField()
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    purchase_date = models.DateTimeField(auto_now_add=True)
 
 class Ticket(models.Model):
     ticketID = models.AutoField(primary_key=True)

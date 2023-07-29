@@ -7,6 +7,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from events.views import CustomTokenObtainPairView, validate_username_email
 from events.views import UserViewSet, CustomerProfileViewSet, OrganizerProfileViewSet , getEventsbyUser
 from events.views import EventViewSet, TicketViewSet, TicketPackageViewSet, OrderViewSet, PaymentViewSet, QRCodeViewSet, CartViewSet, CartItemViewSet
+from events.views import save_ticket_purchase
 from events import views
 
 router = routers.DefaultRouter()
@@ -32,6 +33,7 @@ urlpatterns = [
     path('api/pak/<int:user_id>', getEventsbyUser ,name='rest_framework'),
 
     path('api/create-checkout-session', views.create_checkout_session),
+    path('api/save-ticket-purchase', save_ticket_purchase, name='save_ticket_purchase'),
 
 
 
