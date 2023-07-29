@@ -168,3 +168,31 @@ def save_ticket_purchase(request):
         return JsonResponse({'success': True, 'ticket_purchase_id': ticket_purchase.id})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+from django.http import JsonResponse
+from .models import Event
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def update_event(request, event_id):
+    if request.method == "PUT":
+        try:
+            event = Event.objects.get(id=event_id)
+            event.eventNAME = request.PUT.get('eventNAME', event.eventNAME)
+            event.eventDATE = request.PUT.get('eventDATE', event.eventDATE)
+            event.eventDISCRIPTION = request.PUT.get('eventDISCRIPTION', event.eventDISCRIPTION)
+            event.eventLOCATION = request.PUT.get('eventLOCATION', event.eventLOCATION)
+            event.eventSTARTTIME = request.PUT.get('eventSTARTTIME', event.eventSTARTTIME)
+            event.eventADDRESS = request.PUT.get('eventADDRESS', event.eventADDRESS)
+
+            # Handle the event image
+            if 'eventIMAGE' in request.FILES:
+                event.eventIMAGE = request.FILES['eventIMAGE']
+
+            event.save()
+            return JsonResponse({'message': 'Event updated successfully'}, status=200)
+        except Event.DoesNotExist:
+            return JsonResponse({'error': 'Event not found'}, status=404)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

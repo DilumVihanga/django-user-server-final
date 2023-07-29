@@ -8,6 +8,7 @@ from events.views import CustomTokenObtainPairView, validate_username_email
 from events.views import UserViewSet, CustomerProfileViewSet, OrganizerProfileViewSet , getEventsbyUser
 from events.views import EventViewSet, TicketViewSet, TicketPackageViewSet, OrderViewSet, PaymentViewSet, QRCodeViewSet, CartViewSet, CartItemViewSet
 from events.views import save_ticket_purchase
+from events.views import update_event
 from events import views
 
 router = routers.DefaultRouter()
@@ -34,6 +35,7 @@ urlpatterns = [
 
     path('api/create-checkout-session', views.create_checkout_session),
     path('api/save-ticket-purchase', save_ticket_purchase, name='save_ticket_purchase'),
+    path('api/events/<int:event_id>/', update_event),
 
 
 

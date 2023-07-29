@@ -98,8 +98,7 @@ class Event(models.Model):
     eventSTARTTIME = models.TimeField()
     eventADDRESS = models.CharField(max_length=200)
     eventIMAGE = models.ImageField(upload_to='uploads/images/')
-    eventLAN = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    eventLON = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
 
     def __str__(self):
         return self.eventNAME
@@ -136,6 +135,7 @@ class TicketPurchase(models.Model):
     quantity = models.IntegerField()
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    stripe_session_id = models.CharField(max_length=255, null=True)
 
 class Ticket(models.Model):
     ticketID = models.AutoField(primary_key=True)
