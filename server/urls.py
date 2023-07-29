@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from events.views import CustomTokenObtainPairView, validate_username_email
 from events.views import UserViewSet, CustomerProfileViewSet, OrganizerProfileViewSet , getEventsbyUser
 from events.views import EventViewSet, TicketViewSet, TicketPackageViewSet, OrderViewSet, PaymentViewSet, QRCodeViewSet, CartViewSet, CartItemViewSet
-
+from events import views
 
 router = routers.DefaultRouter()
 router.register('users', UserViewSet)
@@ -30,7 +30,10 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/validate-username-email/', validate_username_email, name='validate_username_email'),
     path('api/pak/<int:user_id>', getEventsbyUser ,name='rest_framework'),
-    
+
+    path('api/create-checkout-session', views.create_checkout_session),
+
+
 
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

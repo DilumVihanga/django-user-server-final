@@ -66,17 +66,31 @@ class EventSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+# rest of your serializers...
+
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = '__all__'
+        fields = ['id', 'cart', 'event', 'ticket_package', 'quantity']
+
+class CartItemReadSerializer(serializers.ModelSerializer):
+    event_name = serializers.CharField(source='event.eventNAME', read_only=True)
+    package_name = serializers.CharField(source='ticket_package.package_name', read_only=True)
+    package_price = serializers.DecimalField(source='ticket_package.package_price', max_digits=6, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'cart', 'event', 'event_name', 'ticket_package', 'package_name','package_price', 'quantity']
+
+
 
 class CartSerializer(serializers.ModelSerializer):
-    cart_items = CartItemSerializer(many=True, read_only=True)
+    cart_items = CartItemReadSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
-        fields = '__all__'        
+        fields = '__all__'
+
 
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:

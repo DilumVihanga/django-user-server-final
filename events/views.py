@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import User,CustomerProfile, OrganizerProfile
 from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode, Cart, CartItem
-from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer
+from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer, CartItemReadSerializer
 from .serializers import EventSerializer, TicketSerializer, TicketPackageSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer, CartSerializer, CartItemSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -37,17 +37,21 @@ class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
+# rest of your viewsets...
+
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in ['GET']:
+            return CartItemReadSerializer
+        return CartItemSerializer
 
     @action(detail=False, url_path='cart/(?P<cart_id>\d+)', methods=['get'])
     def items_for_cart(self, request, cart_id=None):
         items = self.get_queryset().filter(cart__id=cart_id)
-        serializer = self.get_serializer(items, many=True)
+        serializer = CartItemReadSerializer(items, many=True)
         return Response(serializer.data)
-
-
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -96,3 +100,38 @@ def getEventsbyUser(request , user_id):
     events = Event.objects.filter(user=user_id)
     serializer = EventSerializer(events, many=True)
     return Response(serializer.data)
+
+from django.http import JsonResponse
+import stripe
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+
+@csrf_exempt
+@require_POST
+def create_checkout_session(request):
+    stripe.api_key = 'sk_test_51NZAWGH8EMA77BE5sZT7wQfCTg3ogscDUwQqFCMGeMdV8OCBzzAd0UmvzoPPBVnh5F0zkAYlnVudgnIqgQWQhW4D00XXUtZpND'
+
+    # Parse the request body to get the amount
+    body = json.loads(request.body)
+    amount = body.get('amount', 1000)  # Example amount in cents
+
+    # Create the checkout session
+    session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[{
+            'price_data': {
+                'currency': 'usd',  # Change currency if needed
+                'product_data': {
+                    'name': 'Ticket Purchase',
+                },
+                'unit_amount': amount,
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url='http://localhost:3000/',
+        cancel_url='http://localhost:3000/cart',
+    )
+
+    return JsonResponse({'session': {'url': session.url}})
