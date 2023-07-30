@@ -137,6 +137,32 @@ class TicketPurchase(models.Model):
     purchase_date = models.DateTimeField(auto_now_add=True)
     stripe_session_id = models.CharField(max_length=255, null=True)
 
+from django.db import models
+
+class QRCode(models.Model):
+    ticket_purchase = models.OneToOneField(TicketPurchase, on_delete=models.CASCADE)
+    qr_code_image = models.ImageField(upload_to='qrcodes/')
+
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=TicketPurchase)
+def create_qr_code(sender, instance, created, **kwargs):
+    if created:
+        qr_code = qrcode.make(str(instance.id))
+        buffer = BytesIO()
+        qr_code.save(buffer, format='PNG')
+        filename = f'qr_code_{instance.id}.png'
+        filebuffer = File(buffer, filename)
+        qr_code_instance = QRCode(ticket_purchase=instance)
+        qr_code_instance.qr_code_image.save(filename, filebuffer)
+        qr_code_instance.save()
+
+
+
 class Ticket(models.Model):
     ticketID = models.AutoField(primary_key=True)
     packageID = models.ForeignKey(TicketPackage, on_delete=models.CASCADE, related_name='tickets')
@@ -149,60 +175,3 @@ class Ticket(models.Model):
         return f"{self.packageID.package_name} - {self.ticket_type}"
 
 
-class Order(models.Model):
-    orderID = models.AutoField(primary_key=True)
-    customerID = models.ForeignKey('CustomerProfile', on_delete=models.CASCADE)
-    paymentID = models.ForeignKey('Payment', on_delete=models.CASCADE)
-    ticketID = models.ForeignKey('Ticket', on_delete=models.CASCADE)
-    qrcodeID = models.ForeignKey('QRCode', on_delete=models.CASCADE)
-    orderAMOUNT = models.DecimalField(max_digits=7, decimal_places=2)
-    orderTIME = models.DateTimeField(auto_now_add=True)
-    orderSTATUS = models.CharField(max_length=200)
-    orderDATE = models.DateField()
-
-    def __str__(self):
-        return str(self.orderID)
-
-
-class Payment(models.Model):
-    paymentID = models.AutoField(primary_key=True)
-    customerID = models.ForeignKey('CustomerProfile', on_delete=models.CASCADE)
-    paymentSTATUS = models.CharField(max_length=200)
-    fullName = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
-    phone = models.CharField(max_length=20)
-    nic = models.CharField(max_length=20)
-
-    def __str__(self):
-        return str(self.paymentID)
-
-
-class QRCode(models.Model):
-    qrcodeID = models.AutoField(primary_key=True)
-    qrDATA = models.CharField(max_length=200)
-
-    def __str__(self):
-        return str(self.qrcodeID)
-
-
-class SalesDashboard(models.Model):
-    dashboardID = models.AutoField(primary_key=True)
-    organizerID = models.ForeignKey('OrganizerProfile', on_delete=models.CASCADE)
-    topSellingEvents = models.TextField()
-    totalRevenue = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return str(self.dashboardID)
-
-
-class SalesReport(models.Model):
-    reportID = models.AutoField(primary_key=True)
-    dashboardID = models.ForeignKey('SalesDashboard', on_delete=models.CASCADE)
-    nic = models.CharField(max_length=20)
-    fullName = models.CharField(max_length=200)
-    ticketT_NAME = models.CharField(max_length=200)
-    ticketQUANTITY = models.IntegerField()
-    ticketSUBTOTAL = models.DecimalField(max_digits=7, decimal_places=2)
-
-    def __str__(self):
-        return str(self.reportID)

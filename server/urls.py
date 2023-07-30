@@ -6,9 +6,10 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenRefreshView
 from events.views import CustomTokenObtainPairView, validate_username_email
 from events.views import UserViewSet, CustomerProfileViewSet, OrganizerProfileViewSet , getEventsbyUser
-from events.views import EventViewSet, TicketViewSet, TicketPackageViewSet, OrderViewSet, PaymentViewSet, QRCodeViewSet, CartViewSet, CartItemViewSet
+from events.views import EventViewSet,  TicketPackageViewSet, CartViewSet, CartItemViewSet, TicketPurchaseViewSet, QRCodeViewSet
 from events.views import save_ticket_purchase
 from events.views import update_event
+from events.views import get_ticket_purchase
 from events import views
 
 router = routers.DefaultRouter()
@@ -16,14 +17,15 @@ router.register('users', UserViewSet)
 router.register('customer-profiles', CustomerProfileViewSet)
 router.register('organizer-profiles', OrganizerProfileViewSet)
 router.register('events', EventViewSet)
-router.register('tickets', TicketViewSet)
+
 router.register('ticket-packages', TicketPackageViewSet)    
-router.register('orders', OrderViewSet)
-router.register('payments', PaymentViewSet)
+
 router.register('cart', CartViewSet)
 router.register('cart-items', CartItemViewSet)
 router.register('carts', CartViewSet)
 router.register('items', CartItemViewSet)
+router.register('ticket-purchases', TicketPurchaseViewSet)
+router.register('qr-codes', QRCodeViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,7 +37,7 @@ urlpatterns = [
 
     path('api/create-checkout-session', views.create_checkout_session),
     path('api/save-ticket-purchase', save_ticket_purchase, name='save_ticket_purchase'),
-    path('api/events/<int:event_id>/', update_event),
+    path('api/events/<int:event_id>/', update_event),path('api/ticket_purchase/<int:ticket_purchase_id>/', get_ticket_purchase),
 
 
 

@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .models import User,CustomerProfile, OrganizerProfile
-from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode, Cart, CartItem
-from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer, CartItemReadSerializer
-from .serializers import EventSerializer, TicketSerializer, TicketPackageSerializer, OrderSerializer, PaymentSerializer, QRCodeSerializer, CartSerializer, CartItemSerializer
+from .models import Event,  TicketPackage, Cart, CartItem, TicketPurchase, QRCode
+from .serializers import UserSerializer, CustomerProfileSerializer, OrganizerProfileSerializer, CartItemReadSerializer, TicketPurchaseSerializer
+from .serializers import EventSerializer, TicketPackageSerializer,  CartSerializer, CartItemSerializer, QRCodeSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 
@@ -25,9 +25,7 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
-class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
+
 
 class TicketPackageViewSet(viewsets.ModelViewSet):
     queryset = TicketPackage.objects.all()
@@ -53,18 +51,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
         serializer = CartItemReadSerializer(items, many=True)
         return Response(serializer.data)
 
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+class TicketPurchaseViewSet(viewsets.ModelViewSet):
+    queryset = TicketPurchase.objects.all()
+    serializer_class = TicketPurchaseSerializer
 
-class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.all()
-    serializer_class = PaymentSerializer
-
+                  
 class QRCodeViewSet(viewsets.ModelViewSet):
     queryset = QRCode.objects.all()
-    serializer_class = QRCodeSerializer                    
-
+    serializer_class = QRCodeSerializer
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
@@ -130,7 +124,7 @@ def create_checkout_session(request):
             'quantity': 1,
         }],
         mode='payment',
-        success_url='http://localhost:3000/',
+        success_url='http://localhost:3000/ordersuccess',
         cancel_url='http://localhost:3000/cart',
     )
 
@@ -196,3 +190,26 @@ def update_event(request, event_id):
             return JsonResponse({'error': 'Event not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+from django.http import JsonResponse
+
+def get_ticket_purchase(request, ticket_purchase_id):
+    try:
+        ticket_purchase = TicketPurchase.objects.get(id=ticket_purchase_id)
+        ticket_packages = TicketPackage.objects.filter(ticket_purchase=ticket_purchase)
+        packages = [
+            {
+                'name': package.package_name,
+                'description': package.package_description,
+                'price': package.package_price,
+                'quantity': package.package_ticketquantity,
+            }
+            for package in ticket_packages
+        ]
+        return JsonResponse({
+            'event_name': ticket_purchase.event_name,
+            'subtotal': ticket_purchase.subtotal,
+            'purchase_date': ticket_purchase.purchase_date,
+            'packages': packages,
+        })
+    except TicketPurchase.DoesNotExist:
+        return JsonResponse({'error': 'Ticket purchase not found'}, status=404)

@@ -1,7 +1,7 @@
 # events/serializers.py
 from rest_framework import serializers
 from .models import CustomerProfile, OrganizerProfile
-from .models import Event, Ticket, TicketPackage, Order, Payment, QRCode, Cart, CartItem
+from .models import Event, TicketPackage, Cart, CartItem, TicketPurchase, QRCode
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -91,28 +91,16 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
-
-class TicketSerializer(serializers.ModelSerializer):
+class TicketPurchaseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Ticket
+        model = TicketPurchase
         fields = '__all__'
 
-
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = '__all__'
-
-class PaymentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Payment
-        fields = '__all__'
 
 class QRCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = QRCode
-        fields = '__all__'      
-
+        fields = '__all__'
 
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
