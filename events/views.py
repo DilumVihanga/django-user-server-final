@@ -213,3 +213,29 @@ def get_ticket_purchase(request, ticket_purchase_id):
         })
     except TicketPurchase.DoesNotExist:
         return JsonResponse({'error': 'Ticket purchase not found'}, status=404)
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import CartItem
+
+@api_view(['DELETE'])
+def clear_cart_for_user(request, user_id):
+    try:
+        CartItem.objects.filter(cart__user_id=user_id).delete()
+        return Response({'message': 'Cart cleared successfully'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['POST'])
+def validate_qr_code(request, qr_code_id):
+    try:
+        qr_code = QRCode.objects.get(id=qr_code_id)
+        qr_code.validated = True
+        qr_code.save()
+        return Response({'message': 'QR code validated successfully'}, status=200)
+    except QRCode.DoesNotExist:
+        return Response({'error': 'QR code not found'}, status=404)

@@ -142,6 +142,7 @@ from django.db import models
 class QRCode(models.Model):
     ticket_purchase = models.OneToOneField(TicketPurchase, on_delete=models.CASCADE)
     qr_code_image = models.ImageField(upload_to='qrcodes/')
+    validated = models.BooleanField(default=False)
 
 import qrcode
 from io import BytesIO
