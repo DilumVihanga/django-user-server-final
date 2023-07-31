@@ -12,7 +12,9 @@ admin.site.register(Ticket)
 admin.site.register(TicketPackage)
 admin.site.register(QRCode)
 
+admin.site.site_header = "Event Lanka Admin"
+admin.site.site_title = "Event Lanka Admin Portal"
+admin.site.index_title = "Welcome to Event Lanka Admin Portal"
 
 
-admin.sitename = 'Event Management System'
 
