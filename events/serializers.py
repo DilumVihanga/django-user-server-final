@@ -127,3 +127,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['role'] = self.user.role
 
         return data        
+
+
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.set_password(validated_data.get('password'))
+        instance.save()
+        return instance
+     

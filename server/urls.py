@@ -11,6 +11,7 @@ from events.views import save_ticket_purchase
 from events.views import update_event
 from events.views import get_ticket_purchase
 from events.views import clear_cart_for_user
+from events.views import UserUpdateView
 from events.views import validate_qr_code
 
 from events import views
@@ -43,6 +44,7 @@ urlpatterns = [
     path('api/events/<int:event_id>/', update_event),path('api/ticket_purchase/<int:ticket_purchase_id>/', get_ticket_purchase),
     path('api/items/cart/<int:user_id>/', clear_cart_for_user, name='clear-cart-for-user'),
     path('api/validate-qr-code/<int:qr_code_id>/', validate_qr_code, name='validate_qr_code'),
+    path('api/usersup/<int:user_id>', UserUpdateView.as_view(), name='user-update'),
 
 
 

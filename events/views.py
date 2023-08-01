@@ -239,3 +239,15 @@ def validate_qr_code(request, qr_code_id):
         return Response({'message': 'QR code validated successfully'}, status=200)
     except QRCode.DoesNotExist:
         return Response({'error': 'QR code not found'}, status=404)
+
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UserUpdateSerializer  # Adjust the import path as needed
+
+class UserUpdateView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
